@@ -40,11 +40,13 @@ export default function HomeContent({ kategori }: { kategori: KategoriKartu[] })
 
   return (
     <>
-      <div className="hero-banner" style={{ backgroundImage: 'url(https://picsum.photos/seed/hero-aboet/800/600)' }}>
+      <div className="hero-banner hero-brand">
         <div className="hero-text">
           <h2>Liburan Seru<br />Menanti!</h2>
           <p>Pilih wahana favoritmu, nikmati pengalaman tak terlupakan di alam Sentul</p>
         </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="Aboet Adventure Sentul" className="hero-logo" width={160} height={160} />
       </div>
 
       <div className="hero-search" role="search">

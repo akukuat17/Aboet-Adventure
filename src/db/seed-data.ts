@@ -50,6 +50,45 @@ const outboundDasar = [
 ];
 const offroadTiers: Tier[] = [['Paket 1', 350000, 8], ['Paket 2', 400000, 30], ['Fullboard', 475000, 30]];
 
+/** Fun Trekking: tiap rute (A–F) adalah paket tersendiri di katalog. [huruf, rute, kegiatan] */
+const bangunTrekking = (
+  level: 'Easy' | 'Medium',
+  jarak: string,
+  durasi: string,
+  medan: 'Mudah' | 'Sedang',
+  tiers: Tier[],
+  rute: [string, string, string][],
+): SeedPaket[] =>
+  rute.map(([huruf, nama, kegiatan]) => ({
+    nama: `Fun Trekking ${level} ${huruf}`,
+    slug: `fun-trekking-${level.toLowerCase()}-${huruf.toLowerCase()}`,
+    lokasi: nama,
+    deskripsi: `Trekking ${level.toLowerCase()} ${jarak} pergi-pulang, rute ${nama}. Sudah termasuk jalan, istirahat, foto-foto dan ${kegiatan}.`,
+    ikon: 'hiking',
+    durasi,
+    medan,
+    tiers,
+    termasuk: trekkingDasar,
+  }));
+
+const TREKKING_EASY = bangunTrekking('Easy', '3–4 km', '2–3 Jam', 'Mudah', [['Easy 1', 175000, 4], ['Easy 2', 250000, 10], ['Fullboard', 350000, 50]], [
+  ['A', 'Curug Leuwi Asih – Bukit Ilalang', 'berenang di curug'],
+  ['B', 'Curug Kencana – Curug Love', 'berenang di curug'],
+  ['C', 'Leuwi Hejo – Curug Barong', 'berenang di curug'],
+  ['D', 'Hutan Pinus – Kawah Merah', 'berendam air panas'],
+  ['E', 'Curug Cibingbin – Curug Ngumpet', 'berenang di curug'],
+  ['F', 'Curug Bidadari via Cibingbin', 'berenang di curug'],
+]);
+
+const TREKKING_MEDIUM = bangunTrekking('Medium', '6–8 km', '3–4 Jam', 'Sedang', [['Medium 1', 200000, 4], ['Medium 2', 275000, 10], ['Fullboard', 375000, 50]], [
+  ['A', 'Goa Garunggang – Curug Leuwi Asih', 'berenang di curug'],
+  ['B', 'Curug Cibaliung – Leuwi Hejo', 'berenang di curug'],
+  ['C', 'Bukit Paniisan via Gunung Pancar', 'menikmati alam'],
+  ['D', 'Curug Hordeng – Curug Ciburial', 'berenang di curug'],
+  ['E', 'Gunung Kuta – Curug Mariuk', 'berenang di curug'],
+  ['F', 'Bukit Daolong – Bukit Silala', 'menikmati alam'],
+]);
+
 export const SEED_PAKET: Record<string, SeedPaket[]> = {
   'rafting-air': [
     {
@@ -86,18 +125,8 @@ export const SEED_PAKET: Record<string, SeedPaket[]> = {
     },
   ],
   'fun-trekking-hiking': [
-    {
-      nama: 'Fun Trekking Easy', slug: 'fun-trekking-easy', lokasi: 'Sentul, Bogor',
-      deskripsi: 'Trekking santai 3–4 km pergi-pulang. Pilihan rute: Curug Leuwi Asih – Bukit Ilalang • Curug Kencana – Curug Love • Leuwi Hejo – Curug Barong • Hutan Pinus – Kawah Merah • Curug Cibingbin – Curug Ngumpet • Curug Bidadari. Sebutkan rute pilihan saat chat.',
-      ikon: 'hiking', durasi: '2–3 Jam', medan: 'Mudah',
-      tiers: [['Easy 1', 175000, 4], ['Easy 2', 250000, 10], ['Fullboard', 350000, 50]], termasuk: trekkingDasar,
-    },
-    {
-      nama: 'Fun Trekking Medium', slug: 'fun-trekking-medium', lokasi: 'Sentul, Bogor',
-      deskripsi: 'Trekking 6–8 km pergi-pulang. Pilihan rute: Goa Garunggang – Curug Leuwi Asih • Curug Cibaliung – Leuwi Hejo • Bukit Paniisan via Gunung Pancar • Curug Hordeng – Curug Ciburial • Gunung Kuta – Curug Mariuk • Bukit Daolong – Bukit Silala. Sebutkan rute pilihan saat chat.',
-      ikon: 'hiking', durasi: '3–4 Jam', medan: 'Sedang',
-      tiers: [['Medium 1', 200000, 4], ['Medium 2', 275000, 10], ['Fullboard', 375000, 50]], termasuk: trekkingDasar,
-    },
+    ...TREKKING_EASY,
+    ...TREKKING_MEDIUM,
     {
       nama: 'Fun Trekking Cisadon', slug: 'fun-trekking-cisadon', lokasi: 'Kampung Cisadon, Bogor',
       deskripsi: 'Eksplor Kampung Cisadon sejauh 8–15 km: Kampung Awan, Pondok Pemburu, Bukit Cisadon, hingga Dusun Cisadon.',

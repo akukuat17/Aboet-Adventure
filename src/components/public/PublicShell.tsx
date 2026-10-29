@@ -55,20 +55,8 @@ export default function PublicShell({ children }: { children: React.ReactNode })
         {menuBtn}
       </div>
 
-      <main className="pb-20 desktop:pb-0">{children}</main>
+      <main>{children}</main>
 
-      {!halamanDalam && (
-        <nav className="bottom-nav desktop:hidden" aria-label="Navigasi utama">
-          <nav aria-label="Navigasi utama">
-            <Link href="/" className={aktifHome ? 'active' : ''} aria-current={aktifHome ? 'page' : undefined}>
-              <span className="material-symbols-outlined" aria-hidden="true">home</span>Paket
-            </Link>
-            <Link href="/profil" className={aktifProfil ? 'active' : ''} aria-current={aktifProfil ? 'page' : undefined}>
-              <span className="material-symbols-outlined" aria-hidden="true">info</span>Profil
-            </Link>
-          </nav>
-        </nav>
-      )}
 
       <div
         id="mobile-menu"

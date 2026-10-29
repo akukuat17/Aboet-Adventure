@@ -2006,3 +2006,20 @@ input:focus::placeholder, select:focus::placeholder, textarea:focus::placeholder
 .topbar .brand { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
 .topbar .brand span:not(.mark) { font-family: 'Epilogue', sans-serif; font-weight: 800; font-size: 18px; }
 .bk-tile.accent .val { font-size: 15px; }
+
+/* ───────── Hero bermerek (logo) ───────── */
+.hero-banner.hero-brand {
+  background-image: radial-gradient(circle at 85% 20%, rgba(255,255,255,.14) 0, rgba(255,255,255,0) 45%), linear-gradient(135deg, #1f7a46 0%, #145c34 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px;
+}
+.hero-banner.hero-brand::after { display: none; }
+.hero-banner.hero-brand .hero-text { position: relative; top: auto; left: auto; right: auto; flex: 1; min-width: 0; }
+.hero-logo { position: relative; z-index: 2; width: 128px; height: 128px; flex-shrink: 0; border-radius: 50%; box-shadow: 0 10px 28px rgba(0,0,0,.28); object-fit: contain; }
+@media (min-width: 768px) { .hero-banner.hero-brand { padding: 28px 40px; } .hero-banner.hero-brand .hero-text h2 { font-size: 32px; } .hero-logo { width: 190px; height: 190px; } }
+@media (min-width: 1024px) { .hero-banner.hero-brand { padding: 40px 72px; } .hero-banner.hero-brand .hero-text h2 { font-size: 40px; } .hero-logo { width: 250px; height: 250px; } }
+/* bottom-nav dihapus: kurangi ruang kosong di bawah */
+.app { padding-bottom: 28px; }

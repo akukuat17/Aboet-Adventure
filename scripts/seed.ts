@@ -44,6 +44,9 @@ async function main() {
     }
   }
 
+  // paket lama (Easy/Medium tunggal) digantikan paket per-rute A–F: nonaktifkan, jangan hapus (pemesanan lama tetap utuh)
+  for (const lama of ['fun-trekking-easy', 'fun-trekking-medium']) await db.update(paket).set({ aktif: false }).where(eq(paket.slug, lama));
+
   for (const [kunci, def] of Object.entries(SETTING_DEFAULTS)) {
     await db.insert(pengaturan).values({ kunci, nilai: def.nilai, tipe: def.tipe, label: def.label }).onConflictDoNothing({ target: pengaturan.kunci });
   }
