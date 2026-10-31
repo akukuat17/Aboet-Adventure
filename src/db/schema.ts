@@ -58,12 +58,17 @@ export const paket = pgTable(
   (t) => [index('paket_kategori_aktif_idx').on(t.kategoriId, t.aktif)],
 );
 
+export const TIPE_PEMESANAN = ['family', 'korporat'] as const;
+export type TipePemesanan = (typeof TIPE_PEMESANAN)[number];
+export const SUMBER_PEMESANAN = ['web', 'manual', 'import'] as const;
+export type SumberPemesanan = (typeof SUMBER_PEMESANAN)[number];
+
 export const STATUS_PEMESANAN = ['baru', 'dikonfirmasi', 'selesai', 'batal'] as const;
 export type StatusPemesanan = (typeof STATUS_PEMESANAN)[number];
 
 /**
- * Pemesanan hanya untuk tipe Family (isi form).
- * Korporat/PT langsung ke WhatsApp tanpa disimpan ke database.
+ * Pemesanan dari form situs selalu tipe Family. Korporat/PT di situs langsung ke WhatsApp;
+ * data korporat masuk ke sini lewat input manual / import Excel oleh admin.
  */
 export const pemesanan = pgTable(
   'pemesanan',
@@ -80,6 +85,11 @@ export const pemesanan = pgTable(
     catatan: text('catatan'),
     estimasiTotal: bigint('estimasi_total', { mode: 'number' }).notNull(),
     hargaFinal: bigint('harga_final', { mode: 'number' }),
+    /** family = perorangan/keluarga, korporat = perusahaan/instansi (diinput admin atau import) */
+    tipe: varchar('tipe', { length: 20 }).$type<TipePemesanan>().notNull().default('family'),
+    perusahaan: varchar('perusahaan', { length: 255 }),
+    /** web = dari form situs; manual = diinput admin; import = dari file Excel */
+    sumber: varchar('sumber', { length: 20 }).$type<SumberPemesanan>().notNull().default('web'),
     status: varchar('status', { length: 20 }).$type<StatusPemesanan>().notNull().default('baru'),
     tanggalKonfirmasi: timestamp('tanggal_konfirmasi', { withTimezone: true }),
     ...timestamps,

@@ -28,3 +28,13 @@ npm run dev           # http://localhost:3000
 - Semua halaman dinamis (selalu baca DB terbaru). Build tidak butuh DB.
 - Sesi admin: cookie JWT `aboet_admin` (12 jam, 30 hari bila "Ingat saya"); dijaga `src/proxy.ts` + pengecekan di tiap halaman/action.
 - Bulan ditampilkan dalam bahasa Indonesia, zona waktu WIB.
+
+## Pembaruan: Korporat, Import Excel & Rekap Bulanan
+
+- **Migrasi baru** (`0001`, `0002`): setelah deploy jalankan sekali `npm run db:setup` ke database produksi (aman diulang).
+- **Pemesanan** punya kolom **Tipe** (Family / Korporat), **Perusahaan**, dan **Sumber** (web / manual / import). Bisa difilter per tipe.
+- **Family** masuk otomatis dari form situs. **Korporat yang sudah deal** dicatat lewat Admin → Pemesanan → *Tambah Korporat (Deal)* agar masuk statistik.
+- **Export Excel**: tombol *Export Excel* di Pemesanan (family + korporat, ikut filter). **Import Excel** menerima keduanya lewat kolom Tipe.
+- **Import Excel**: Admin → Pemesanan → *Import Excel*. Unduh template, isi, upload. Baris yang salah dilewati dan alasannya ditampilkan.
+- **Rekap Bulanan**: Admin → *Rekap Bulanan* (ringkasan, pie chart per kategori, grafik harian, per paket, daftar) + tombol **Excel** untuk unduh.
+- Form Kategori & Paket kini punya bar **Simpan / Batal** di bawah.

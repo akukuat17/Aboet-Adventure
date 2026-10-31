@@ -8,6 +8,7 @@ import { logout } from '@/actions/auth';
 const NAV = [
   { href: '/admin', ikon: 'dashboard', label: 'Dashboard', exact: true },
   { href: '/admin/pemesanan', ikon: 'receipt_long', label: 'Pemesanan' },
+  { href: '/admin/rekap', ikon: 'summarize', label: 'Rekap Bulanan' },
   { href: '/admin/kategori', ikon: 'category', label: 'Kategori' },
   { href: '/admin/paket', ikon: 'local_activity', label: 'Paket Wahana' },
   { href: '/admin/pengaturan', ikon: 'settings', label: 'Pengaturan' },
@@ -45,9 +46,8 @@ export default function AdminShell({ nama, children, flash }: { nama: string; ch
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-gray-200 flex-shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary-soft flex items-center justify-center">
-                <span className="material-symbols-outlined text-primary-dark">landscape</span>
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="" width={40} height={40} className="rounded-full flex-shrink-0" />
               <span className="font-heading font-extrabold text-xl text-gray-900">Aboet Admin</span>
             </div>
           </div>
@@ -77,9 +77,8 @@ export default function AdminShell({ nama, children, flash }: { nama: string; ch
         {/* Top bar mobile */}
         <div className="lg:hidden fixed top-0 inset-x-0 z-30 h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary-soft flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary-dark">landscape</span>
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="" width={32} height={32} className="rounded-full flex-shrink-0" />
             <span className="font-heading font-extrabold text-lg text-gray-900">Aboet Admin</span>
           </div>
           <button onClick={() => setOpen(true)} aria-label="Buka menu" className="p-2 rounded-lg hover:bg-gray-100">
@@ -90,9 +89,8 @@ export default function AdminShell({ nama, children, flash }: { nama: string; ch
         {/* Header desktop */}
         <header className="hidden lg:flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 sticky top-0 z-30">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary-soft flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary-dark">landscape</span>
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="" width={32} height={32} className="rounded-full flex-shrink-0" />
             <span className="font-heading font-extrabold text-lg text-gray-900">Aboet Admin</span>
           </div>
           <div className="flex items-center gap-4">

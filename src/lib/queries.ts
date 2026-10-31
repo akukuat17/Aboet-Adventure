@@ -154,14 +154,15 @@ export async function getPaketById(id: number) {
 const awalHari = (iso: string) => new Date(`${iso}T00:00:00+07:00`);
 const akhirHari = (iso: string) => new Date(`${iso}T23:59:59.999+07:00`);
 
-export async function listPemesanan(f: { status?: string; search?: string; dateFrom?: string; dateTo?: string; page?: string }) {
+export async function listPemesanan(f: { status?: string; tipe?: string; search?: string; dateFrom?: string; dateTo?: string; page?: string }) {
   const db = await getDb();
   const page = halaman(f.page);
   const conds = [];
   if (f.status) conds.push(eq(pemesanan.status, f.status as StatusPemesanan));
+  if (f.tipe === 'family' || f.tipe === 'korporat') conds.push(eq(pemesanan.tipe, f.tipe));
   if (f.search) {
     const q = `%${f.search}%`;
-    conds.push(or(ilike(pemesanan.kode, q), ilike(pemesanan.nama, q), ilike(pemesanan.whatsapp, q))!);
+    conds.push(or(ilike(pemesanan.kode, q), ilike(pemesanan.nama, q), ilike(pemesanan.whatsapp, q), ilike(pemesanan.perusahaan, q))!);
   }
   if (f.dateFrom) conds.push(gte(pemesanan.createdAt, awalHari(f.dateFrom)));
   if (f.dateTo) conds.push(lte(pemesanan.createdAt, akhirHari(f.dateTo)));
@@ -215,6 +216,8 @@ export async function getDashboard(start: string, end: string) {
       pendapatan: sql<number>`COALESCE(SUM(CASE WHEN ${pemesanan.status} IN ('dikonfirmasi','selesai') THEN ${pendapatanExpr} ELSE 0 END), 0)`,
       baru: sql<number>`COUNT(*) FILTER (WHERE ${pemesanan.status} = 'baru')`,
       selesai: sql<number>`COUNT(*) FILTER (WHERE ${pemesanan.status} = 'selesai')`,
+      korporat: sql<number>`COUNT(*) FILTER (WHERE ${pemesanan.tipe} = 'korporat')`,
+      web: sql<number>`COUNT(*) FILTER (WHERE ${pemesanan.sumber} = 'web')`,
     })
     .from(pemesanan)
     .where(rentang);
@@ -230,7 +233,7 @@ export async function getDashboard(start: string, end: string) {
   const bulanKor = sql<string>`to_char(${klikWa.createdAt} AT TIME ZONE ${TZ_SQL}, 'YYYY-MM')`;
   const batas = (kol: typeof pemesanan.createdAt | typeof klikWa.createdAt) =>
     gte(kol, sql`(date_trunc('month', now() AT TIME ZONE ${TZ_SQL}) - interval '11 months') AT TIME ZONE ${TZ_SQL}`);
-  const waFamily = await db.select({ bulan: bulanFam, total: count() }).from(pemesanan).where(batas(pemesanan.createdAt)).groupBy(bulanFam);
+  const waFamily = await db.select({ bulan: bulanFam, total: count() }).from(pemesanan).where(and(batas(pemesanan.createdAt), eq(pemesanan.sumber, 'web'))).groupBy(bulanFam);
   const waKorporat = await db.select({ bulan: bulanKor, total: count() }).from(klikWa).where(batas(klikWa.createdAt)).groupBy(bulanKor);
 
   // Pendapatan 12 bulan terakhir (per bulan WIB)
@@ -242,12 +245,19 @@ export async function getDashboard(start: string, end: string) {
     .groupBy(bulanSql);
 
   const perKategori = await db
-    .select({ nama: kategori.nama, total: count() })
+    .select({
+      nama: kategori.nama,
+      ikon: kategori.ikon,
+      warnaBg: kategori.warnaBg,
+      warnaIkon: kategori.warnaIkon,
+      total: count(),
+      pendapatan: sql<number>`COALESCE(SUM(CASE WHEN ${pemesanan.status} IN ('dikonfirmasi','selesai') THEN ${pendapatanExpr} ELSE 0 END), 0)`,
+    })
     .from(pemesanan)
     .innerJoin(paket, eq(pemesanan.paketId, paket.id))
     .innerJoin(kategori, eq(paket.kategoriId, kategori.id))
     .where(rentang)
-    .groupBy(kategori.id, kategori.nama);
+    .groupBy(kategori.id, kategori.nama, kategori.ikon, kategori.warnaBg, kategori.warnaIkon);
 
   const terlaris = await db
     .select({ nama: paket.nama, total: sql<number>`SUM(${pemesanan.jumlah})` })
@@ -270,14 +280,106 @@ export async function getDashboard(start: string, end: string) {
     pendapatan: Number(ringkas.pendapatan),
     baru: Number(ringkas.baru),
     selesai: Number(ringkas.selesai),
+    korporatPesanan: Number(ringkas.korporat),
+    web: Number(ringkas.web),
     korporat: Number(kor.total),
     waBulanan: {
       family: waFamily.map((b) => ({ bulan: b.bulan, total: Number(b.total) })),
       korporat: waKorporat.map((b) => ({ bulan: b.bulan, total: Number(b.total) })),
     },
     bulanan: bulanan.map((b) => ({ bulan: b.bulan, total: Number(b.total) })),
-    perKategori: perKategori.map((k) => ({ nama: k.nama, total: Number(k.total) })),
+    perKategori: perKategori.map((k) => ({ nama: k.nama, ikon: k.ikon, warnaBg: k.warnaBg, warnaIkon: k.warnaIkon, total: Number(k.total), pendapatan: Number(k.pendapatan) })),
     terlaris: terlaris.map((p) => ({ nama: p.nama, total: Number(p.total) })),
     terbaru: terbaru.map((r) => ({ ...r.pemesanan, paket: r.paket })),
+  };
+}
+
+/* ───────────────────────── Admin: rekap bulanan ───────────────────────── */
+
+export async function getRekap(bulan: string) {
+  const db = await getDb();
+  const [y, m] = bulan.split('-').map(Number);
+  const start = `${bulan}-01`;
+  const end = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
+  const rentang = and(gte(pemesanan.createdAt, awalHari(start)), lte(pemesanan.createdAt, akhirHari(end)));
+  const dihitung = sql`${pemesanan.status} IN ('dikonfirmasi','selesai')`;
+
+  const [r] = await db
+    .select({
+      total: count(),
+      family: sql<number>`COUNT(*) FILTER (WHERE ${pemesanan.tipe} = 'family')`,
+      korporat: sql<number>`COUNT(*) FILTER (WHERE ${pemesanan.tipe} = 'korporat')`,
+      baru: sql<number>`COUNT(*) FILTER (WHERE ${pemesanan.status} = 'baru')`,
+      dikonfirmasi: sql<number>`COUNT(*) FILTER (WHERE ${pemesanan.status} = 'dikonfirmasi')`,
+      selesai: sql<number>`COUNT(*) FILTER (WHERE ${pemesanan.status} = 'selesai')`,
+      batal: sql<number>`COUNT(*) FILTER (WHERE ${pemesanan.status} = 'batal')`,
+      peserta: sql<number>`COALESCE(SUM(CASE WHEN ${dihitung} THEN ${pemesanan.jumlah} ELSE 0 END), 0)`,
+      pendapatan: sql<number>`COALESCE(SUM(CASE WHEN ${dihitung} THEN ${pendapatanExpr} ELSE 0 END), 0)`,
+      pendapatanFamily: sql<number>`COALESCE(SUM(CASE WHEN ${dihitung} AND ${pemesanan.tipe} = 'family' THEN ${pendapatanExpr} ELSE 0 END), 0)`,
+      pendapatanKorporat: sql<number>`COALESCE(SUM(CASE WHEN ${dihitung} AND ${pemesanan.tipe} = 'korporat' THEN ${pendapatanExpr} ELSE 0 END), 0)`,
+      web: sql<number>`COUNT(*) FILTER (WHERE ${pemesanan.sumber} = 'web')`,
+    })
+    .from(pemesanan)
+    .where(rentang);
+
+  const [kor] = await db
+    .select({ total: count() })
+    .from(klikWa)
+    .where(and(gte(klikWa.createdAt, awalHari(start)), lte(klikWa.createdAt, akhirHari(end))));
+
+  const perKategori = await db
+    .select({
+      nama: kategori.nama,
+      ikon: kategori.ikon,
+      warnaBg: kategori.warnaBg,
+      warnaIkon: kategori.warnaIkon,
+      total: count(),
+      pendapatan: sql<number>`COALESCE(SUM(CASE WHEN ${dihitung} THEN ${pendapatanExpr} ELSE 0 END), 0)`,
+    })
+    .from(pemesanan)
+    .innerJoin(paket, eq(pemesanan.paketId, paket.id))
+    .innerJoin(kategori, eq(paket.kategoriId, kategori.id))
+    .where(rentang)
+    .groupBy(kategori.id, kategori.nama, kategori.ikon, kategori.warnaBg, kategori.warnaIkon);
+
+  const perPaket = await db
+    .select({
+      nama: paket.nama,
+      kategori: kategori.nama,
+      total: count(),
+      peserta: sql<number>`COALESCE(SUM(CASE WHEN ${dihitung} THEN ${pemesanan.jumlah} ELSE 0 END), 0)`,
+      pendapatan: sql<number>`COALESCE(SUM(CASE WHEN ${dihitung} THEN ${pendapatanExpr} ELSE 0 END), 0)`,
+    })
+    .from(pemesanan)
+    .innerJoin(paket, eq(pemesanan.paketId, paket.id))
+    .innerJoin(kategori, eq(paket.kategoriId, kategori.id))
+    .where(rentang)
+    .groupBy(paket.id, paket.nama, kategori.nama)
+    .orderBy(desc(sql`COALESCE(SUM(CASE WHEN ${dihitung} THEN ${pendapatanExpr} ELSE 0 END), 0)`), asc(paket.nama));
+
+  const hariSql = sql<string>`to_char(${pemesanan.createdAt} AT TIME ZONE ${TZ_SQL}, 'YYYY-MM-DD')`;
+  const harian = await db
+    .select({ hari: hariSql, total: count(), pendapatan: sql<number>`COALESCE(SUM(CASE WHEN ${dihitung} THEN ${pendapatanExpr} ELSE 0 END), 0)` })
+    .from(pemesanan)
+    .where(rentang)
+    .groupBy(hariSql);
+
+  const daftar = await db
+    .select({ pemesanan, paket })
+    .from(pemesanan)
+    .innerJoin(paket, eq(pemesanan.paketId, paket.id))
+    .where(rentang)
+    .orderBy(asc(pemesanan.createdAt), asc(pemesanan.id));
+
+  return {
+    bulan,
+    start,
+    end,
+    ringkas: Object.fromEntries(Object.entries(r).map(([k, v]) => [k, Number(v)])) as Record<keyof typeof r, number>,
+    klikKorporat: Number(kor.total),
+    perKategori: perKategori.map((k) => ({ ...k, total: Number(k.total), pendapatan: Number(k.pendapatan) })),
+    perPaket: perPaket.map((p) => ({ ...p, total: Number(p.total), peserta: Number(p.peserta), pendapatan: Number(p.pendapatan) })),
+    harian: harian.map((h) => ({ hari: h.hari, total: Number(h.total), pendapatan: Number(h.pendapatan) })),
+    daftar: daftar.map((x) => ({ ...x.pemesanan, paket: x.paket })),
   };
 }

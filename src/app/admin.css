@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+/* Tema warna Aboet untuk utilitas Tailwind (bg-primary, text-primary-dark, accent-primary, ...) */
+@theme {
+  --color-primary: #1f7a46;
+  --color-primary-dark: #145c34;
+  --color-primary-soft: #dff3e6;
+  --color-surface-soft: #eef6ec;
+  --color-text-muted: #6b7d70;
+  --font-heading: 'Epilogue', sans-serif;
+  --font-body: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+}
+
 :root {
   --bg: #f4f9f3;
   --surface: #ffffff;
@@ -532,3 +546,6 @@ img { display: block; max-width: 100%; height: auto; }
   .no-print { display: none !important; }
   .card { box-shadow: none; border: 1px solid #ccc; }
 }
+.badge-purple { background: #f3e8ff; color: #6b21a8; }
+.save-bar { position: sticky; bottom: 0; z-index: 20; display: flex; gap: 12px; justify-content: flex-end; align-items: center; background: rgba(255,255,255,.96); backdrop-filter: blur(6px); border-top: 1px solid var(--border); padding: 12px 16px; margin: 24px -24px -24px; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+@media (max-width: 640px) { .save-bar { margin: 20px -16px -16px; } .save-bar .btn { flex: 1; } }

@@ -28,11 +28,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
 
   const bulan = dua12Bulan();
   const peta = new Map(d.bulanan.map((b) => [b.bulan, b.total]));
-  const totalWa = d.total + d.korporat;
+  const totalWa = d.web + d.korporat;
   const cards = [
     { label: 'Konfirmasi ke WhatsApp', nilai: String(totalWa), ikon: 'chat', warna: 'bg-primary-soft text-primary-dark' },
-    { label: 'Family (form + WA)', nilai: String(d.total), ikon: 'group', warna: 'bg-blue-100 text-blue-700' },
-    { label: 'Korporat (klik WA)', nilai: String(d.korporat), ikon: 'business', warna: 'bg-purple-100 text-purple-700' },
+    { label: 'Pemesanan Tercatat', nilai: String(d.total), ikon: 'receipt_long', warna: 'bg-blue-100 text-blue-700' },
+    { label: 'Pemesanan Korporat', nilai: String(d.korporatPesanan), ikon: 'business', warna: 'bg-purple-100 text-purple-700' },
     { label: 'Pendapatan', nilai: rupiah(d.pendapatan), ikon: 'attach_money', warna: 'bg-green-100 text-green-700' },
   ];
 
@@ -71,8 +71,8 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       <DashboardCharts
         bulananLabel={bulan.map(labelBulan)}
         bulananData={bulan.map((b) => peta.get(b) ?? 0)}
-        kategoriLabel={d.perKategori.map((k) => k.nama)}
-        kategoriData={d.perKategori.map((k) => k.total)}
+        kategori={d.perKategori.map((k) => ({ nama: k.nama, ikon: k.ikon, warnaBg: k.warnaBg, warnaIkon: k.warnaIkon, nilai: k.pendapatan }))}
+        totalPendapatan={rupiah(d.perKategori.reduce((a, k) => a + k.pendapatan, 0))}
         paketLabel={d.terlaris.map((p) => p.nama)}
         paketData={d.terlaris.map((p) => p.total)}
         waFamily={bulan.map((b) => d.waBulanan.family.find((x) => x.bulan === b)?.total ?? 0)}

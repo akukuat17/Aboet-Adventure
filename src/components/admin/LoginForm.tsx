@@ -30,7 +30,8 @@ export default function LoginForm() {
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div className="login-card">
         <div className="brand">
-          <span className="mark"><span className="material-symbols-outlined">landscape</span></span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="Aboet Adventure" width={56} height={56} style={{ borderRadius: '50%', flexShrink: 0 }} />
           <span className="t">Aboet Admin</span>
         </div>
         <h1>Masuk ke Dashboard</h1>

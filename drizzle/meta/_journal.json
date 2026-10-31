@@ -15,6 +15,13 @@
       "when": 1793411619812,
       "tag": "0001_perpetual_human_cannonball",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793431184935,
+      "tag": "0002_wooden_agent_zero",
+      "breakpoints": true
     }
   ]
 }

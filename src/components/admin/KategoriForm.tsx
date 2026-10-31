@@ -61,9 +61,10 @@ export default function KategoriForm({ kategori }: { kategori: Kategori | null }
             </div>
           </div>
 
-          <SubmitButton className="w-full px-4 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition">
-            {kategori ? 'Simpan Perubahan' : 'Tambah Kategori'}
-          </SubmitButton>
+          <div className="save-bar">
+            <Link href="/admin/kategori" className="btn btn-ghost">Batal</Link>
+            <SubmitButton className="btn btn-primary btn-lg">{kategori ? 'Simpan Perubahan' : 'Tambah Kategori'}</SubmitButton>
+          </div>
         </form>
       </div>
     </div>

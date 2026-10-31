@@ -5,6 +5,8 @@ import { getPemesananAdmin } from '@/lib/queries';
 import { rupiah, tanggalJam, tanggalPanjang } from '@/lib/format';
 import { ubahHargaFinal, ubahStatus } from '@/actions/pemesanan';
 import StatusSelect from '@/components/admin/StatusSelect';
+import { hapusPemesanan } from '@/actions/pemesananBaru';
+import ConfirmForm from '@/components/admin/ConfirmForm';
 import SubmitButton from '@/components/admin/SubmitButton';
 
 type Props = { params: Promise<{ id: string }> };
@@ -35,7 +37,12 @@ export default async function PemesananShow({ params }: Props) {
             <h1 className="font-heading font-extrabold text-2xl text-gray-900">Detail Pemesanan</h1>
             <p className="text-gray-600 mt-1">{p.kode}</p>
           </div>
-          <Link href="/admin/pemesanan" className="btn btn-ghost">&larr; Kembali</Link>
+          <div className="flex gap-2">
+            <ConfirmForm action={hapusPemesanan.bind(null, p.id)} pesan="Hapus pemesanan ini permanen?">
+              <button type="submit" className="btn btn-ghost" style={{ color: '#b91c1c' }}>Hapus</button>
+            </ConfirmForm>
+            <Link href="/admin/pemesanan" className="btn btn-ghost">&larr; Kembali</Link>
+          </div>
         </div>
       </div>
 
@@ -57,7 +64,10 @@ export default async function PemesananShow({ params }: Props) {
             <div className="card-header"><h3 className="font-heading font-bold text-lg text-gray-900">Data Pemesan</h3></div>
             <div className="card-body">
               <div className="form-row cols-2">
-                <Row label="Nama">{p.nama}</Row>
+                <Row label="Tipe"><span className={'badge ' + (p.tipe === 'korporat' ? 'badge-purple' : 'badge-info')}>{p.tipe === 'korporat' ? 'Korporat' : 'Family'}</span></Row>
+                {p.perusahaan && <Row label="Perusahaan">{p.perusahaan}</Row>}
+                <Row label={p.tipe === 'korporat' ? 'Nama PIC' : 'Nama'}>{p.nama}</Row>
+                <Row label="Sumber">{p.sumber === 'web' ? 'Form situs' : p.sumber === 'manual' ? 'Input manual' : 'Import Excel'}</Row>
                 <Row label="WhatsApp">{p.whatsapp}</Row>
                 <Row label="Tanggal Kunjungan">{tanggalPanjang(p.tanggalKunjungan)}</Row>
                 <Row label="Jumlah">{p.jumlah} {satuan}</Row>

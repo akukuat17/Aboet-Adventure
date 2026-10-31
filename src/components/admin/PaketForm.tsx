@@ -125,9 +125,10 @@ export default function PaketForm({ paket, kategori }: { paket: Paket | null; ka
             <textarea name="deskripsi" rows={6} defaultValue={val('deskripsi', paket?.deskripsi)} className={INPUT} />
           </div>
 
-          <SubmitButton className="w-full px-4 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition">
-            {paket ? 'Simpan Perubahan' : 'Tambah Paket'}
-          </SubmitButton>
+          <div className="save-bar">
+            <Link href="/admin/paket" className="btn btn-ghost">Batal</Link>
+            <SubmitButton className="btn btn-primary btn-lg">{paket ? 'Simpan Perubahan' : 'Tambah Paket'}</SubmitButton>
+          </div>
         </form>
       </div>
     </div>
