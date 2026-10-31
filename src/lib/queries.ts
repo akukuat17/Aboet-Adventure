@@ -6,7 +6,7 @@ import { WA_DEFAULT } from '@/lib/wa';
 import { TZ } from '@/lib/format';
 import type { StatusPemesanan } from '@/db/schema';
 
-const { kategori, paket, pemesanan, pengaturan } = schema;
+const { kategori, paket, pemesanan, pengaturan, klikWa } = schema;
 
 export const PER_PAGE = 20;
 
@@ -219,6 +219,20 @@ export async function getDashboard(start: string, end: string) {
     .from(pemesanan)
     .where(rentang);
 
+  // Konfirmasi WhatsApp korporat (tanpa form) dicatat di tabel klik_wa
+  const [kor] = await db
+    .select({ total: count() })
+    .from(klikWa)
+    .where(and(gte(klikWa.createdAt, awalHari(start)), lte(klikWa.createdAt, akhirHari(end))));
+
+  // Konfirmasi WA per bulan (12 bulan, WIB): family + korporat
+  const bulanFam = sql<string>`to_char(${pemesanan.createdAt} AT TIME ZONE ${TZ_SQL}, 'YYYY-MM')`;
+  const bulanKor = sql<string>`to_char(${klikWa.createdAt} AT TIME ZONE ${TZ_SQL}, 'YYYY-MM')`;
+  const batas = (kol: typeof pemesanan.createdAt | typeof klikWa.createdAt) =>
+    gte(kol, sql`(date_trunc('month', now() AT TIME ZONE ${TZ_SQL}) - interval '11 months') AT TIME ZONE ${TZ_SQL}`);
+  const waFamily = await db.select({ bulan: bulanFam, total: count() }).from(pemesanan).where(batas(pemesanan.createdAt)).groupBy(bulanFam);
+  const waKorporat = await db.select({ bulan: bulanKor, total: count() }).from(klikWa).where(batas(klikWa.createdAt)).groupBy(bulanKor);
+
   // Pendapatan 12 bulan terakhir (per bulan WIB)
   const bulanSql = sql<string>`to_char(${pemesanan.createdAt} AT TIME ZONE ${TZ_SQL}, 'YYYY-MM')`;
   const bulanan = await db
@@ -256,6 +270,11 @@ export async function getDashboard(start: string, end: string) {
     pendapatan: Number(ringkas.pendapatan),
     baru: Number(ringkas.baru),
     selesai: Number(ringkas.selesai),
+    korporat: Number(kor.total),
+    waBulanan: {
+      family: waFamily.map((b) => ({ bulan: b.bulan, total: Number(b.total) })),
+      korporat: waKorporat.map((b) => ({ bulan: b.bulan, total: Number(b.total) })),
+    },
     bulanan: bulanan.map((b) => ({ bulan: b.bulan, total: Number(b.total) })),
     perKategori: perKategori.map((k) => ({ nama: k.nama, total: Number(k.total) })),
     terlaris: terlaris.map((p) => ({ nama: p.nama, total: Number(p.total) })),

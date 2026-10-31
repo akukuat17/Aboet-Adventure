@@ -55,13 +55,13 @@ export default function HomeContent({ kategori }: { kategori: KategoriKartu[] })
         <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
       </div>
 
-      <nav className="category-row" aria-label="Kategori wahana" style={s('display:flex; gap:8px; overflow-x:auto; padding:26px 20px 8px; scrollbar-width:none;')}>
+      <nav className="category-row" aria-label="Kategori wahana">
         {kategori.map((k) => (
-          <a key={k.id} href={`#kategori-${k.slug}`} className="category-chip" style={s('width:auto; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:8px; text-decoration:none; transition:transform var(--transition-fast);')} aria-label={`Lihat kategori ${k.nama}`}>
-            <span className="cat-icon" style={s(`background:${k.warnaBg}; width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,.08); transition:all var(--transition-base);`)}>
+          <a key={k.id} href={`#kategori-${k.slug}`} className="category-chip">
+            <span className="cat-icon" style={{ background: k.warnaBg }}>
               <span className="material-symbols-outlined" style={s(`color:${k.warnaIkon}; font-size:26px;`)}>{k.ikon}</span>
             </span>
-            <span className="lbl" style={s('font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap; text-align:center;')}>{k.nama}</span>
+            <span className="lbl">{k.nama}</span>
           </a>
         ))}
       </nav>

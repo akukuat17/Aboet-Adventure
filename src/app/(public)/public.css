@@ -2023,3 +2023,68 @@ input:focus::placeholder, select:focus::placeholder, textarea:focus::placeholder
 @media (min-width: 1024px) { .hero-banner.hero-brand { padding: 40px 72px; } .hero-banner.hero-brand .hero-text h2 { font-size: 40px; } .hero-logo { width: 250px; height: 250px; } }
 /* bottom-nav dihapus: kurangi ruang kosong di bawah */
 .app { padding-bottom: 28px; }
+
+/* ───────── Hero merah (senada logo) ───────── */
+.hero-banner.hero-brand {
+  background-image:
+    radial-gradient(circle at 88% 15%, rgba(255,255,255,.18) 0, rgba(255,255,255,0) 42%),
+    linear-gradient(135deg, #e82028 0%, #c3151c 55%, #9d0f15 100%);
+}
+.hero-banner.hero-brand .hero-text p { color: rgba(255,255,255,.92); }
+.hero-brand .hero-logo { box-shadow: 0 10px 28px rgba(80,0,0,.38), 0 0 0 6px rgba(255,255,255,.22); }
+
+/* ───────── Kategori: jarak antar chip lebih lega ───────── */
+.category-row { justify-content: flex-start; gap: 22px; padding: 28px 24px 10px; }
+.category-chip { width: auto !important; min-width: 84px; gap: 10px; padding: 0 4px; }
+@media (min-width: 768px) { .category-row { justify-content: center; gap: 56px; padding: 40px; } .category-chip { width: auto !important; } }
+
+/* ───────── Slider foto detail ───────── */
+.detail-hero.detail-hero-slider { background: var(--primary-soft); }
+.foto-slider { position: relative; width: 100%; }
+.fs-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; border-radius: inherit; outline-offset: 2px; }
+.fs-track::-webkit-scrollbar { display: none; }
+.fs-slide { flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 4 / 3; }
+.fs-slide img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; }
+.detail-hero.detail-hero-slider:hover img { transform: none; }
+.fs-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,.92); color: var(--text); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,.25); cursor: pointer; z-index: 3; }
+.fs-nav.prev { left: 12px; } .fs-nav.next { right: 12px; }
+.fs-nav:disabled { opacity: 0; pointer-events: none; }
+.fs-count { position: absolute; top: 14px; right: 14px; z-index: 3; background: rgba(0,0,0,.55); color: #fff; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+.fs-dots { position: absolute; left: 0; right: 0; bottom: 12px; display: flex; justify-content: center; gap: 7px; z-index: 3; }
+.fs-dots button { width: 8px; height: 8px; border-radius: 999px; border: none; padding: 0; background: rgba(255,255,255,.6); cursor: pointer; transition: all var(--transition-fast); box-shadow: 0 1px 4px rgba(0,0,0,.35); }
+.fs-dots button.on { width: 22px; background: #fff; }
+@media (max-width: 767px) { .fs-nav { display: none; } .fs-slide { aspect-ratio: 4 / 3; } }
+@media (min-width: 1024px) { .fs-slide { aspect-ratio: 4 / 3.2; } }
+
+/* ───────── Tombol kembali ───────── */
+.back-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-weight: 700; font-size: 14px; font-family: inherit; padding: 8px 16px 8px 10px; border-radius: 999px; cursor: pointer; box-shadow: 0 2px 8px rgba(20,40,25,.06); transition: all var(--transition-fast); }
+.back-btn:hover { background: var(--primary-soft); color: var(--primary-dark); }
+.back-btn .material-symbols-outlined { font-size: 22px; }
+.back-btn.icon-only { width: 42px; height: 42px; padding: 0; justify-content: center; flex-shrink: 0; }
+.back-btn.icon-only .back-label { display: none; }
+.back-row { padding: 20px 40px 0; }
+
+/* ───────── Jarak halaman detail/booking lebih lega ───────── */
+.detail-layout { padding: 28px 22px 32px; gap: 28px; }
+.bk-layout { padding: 20px 22px 28px; gap: 24px; }
+.topbar { padding: 16px 20px 12px; gap: 12px; }
+@media (min-width: 768px) { .detail-layout { padding: 32px 36px 40px; } .bk-layout { padding: 28px 36px 40px; } }
+@media (min-width: 1024px) { .detail-layout { padding: 28px 56px 56px; gap: 56px; } .bk-layout { padding: 24px 56px 56px; gap: 56px; } .back-row { padding: 24px 56px 0; } }
+
+/* ───────── Profil: ikon tidak ikut menyusut/terpotong ───────── */
+.info-line { display: flex; align-items: flex-start; gap: 14px; }
+.info-line > .material-symbols-outlined { flex: 0 0 24px; width: 24px; min-width: 24px; font-size: 24px; line-height: 1; overflow: visible; margin-top: 1px; }
+.info-line > div, .info-line > span:not(.material-symbols-outlined) { min-width: 0; line-height: 1.5; }
+.detail-hero.detail-hero-slider { align-self: start; height: auto; }
+@media (min-width: 1024px) { .detail-hero.detail-hero-slider { position: sticky; top: 24px; } }
+.back-row { display: none; }
+@media (min-width: 1024px) { .back-row { display: flex; } }
+
+/* ───────── Perbaikan kontras saat hover ───────── */
+/* Lapisan hijau tua tombol sekarang di BELAKANG teks (sebelumnya menutupi teks yang bukan <span>) */
+.btn-lihat, .btn-primary-lg, .btn-primary-full { isolation: isolate; }
+.btn-lihat::before, .btn-primary-lg::before, .btn-primary-full::before { z-index: -1; }
+.btn-lihat:hover, .btn-primary-lg:hover, .btn-primary-full:hover { color: #fff; }
+/* Kartu yang berubah jadi hijau saat hover: semua teks & ikon di dalamnya jadi putih (menimpa warna inline) */
+.detail-price-row:hover, .detail-price-row:hover *,
+.total-box:hover, .total-box:hover * { color: #fff !important; }

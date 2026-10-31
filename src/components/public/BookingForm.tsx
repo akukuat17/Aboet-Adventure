@@ -29,6 +29,16 @@ export default function BookingForm({ paket, waKorporatUrl }: Props) {
   useEffect(() => setToday(new Date().toLocaleDateString('en-CA')), []);
   useEffect(() => { if (state?.errors) setErrors(state.errors); }, [state]);
 
+  // statistik: catat klik konfirmasi WhatsApp korporat (tidak menghalangi pembukaan WhatsApp)
+  const catatKlikKorporat = () => {
+    try {
+      const data = new Blob([JSON.stringify({ slug: paket.slug })], { type: 'application/json' });
+      if (!navigator.sendBeacon?.('/api/klik-wa', data)) fetch('/api/klik-wa', { method: 'POST', body: data, keepalive: true }).catch(() => {});
+    } catch {
+      /* abaikan */
+    }
+  };
+
   const set = (k: keyof typeof form, v: string | number) => setForm((f) => ({ ...f, [k]: v }));
   const clearError = (k: string) => setErrors((e) => ({ ...e, [k]: '' }));
 
@@ -146,7 +156,7 @@ export default function BookingForm({ paket, waKorporatUrl }: Props) {
         </div>
 
         <div className="sticky-bar bk-bar">
-          <a href={waKorporatUrl} target="_blank" rel="noopener noreferrer" className="btn-primary-full" style={s('flex:1; display:flex; align-items:center; justify-content:center; text-decoration:none; background:var(--primary); color:#fff; font-size:16px; font-weight:800; padding:16px; border-radius:999px; min-height:54px; box-shadow:0 8px 18px rgba(31,122,70,.28);')}>Hubungi via WhatsApp</a>
+          <a href={waKorporatUrl} target="_blank" rel="noopener noreferrer" onClick={catatKlikKorporat} className="btn-primary-full" style={s('flex:1; display:flex; align-items:center; justify-content:center; text-decoration:none; background:var(--primary); color:#fff; font-size:16px; font-weight:800; padding:16px; border-radius:999px; min-height:54px; box-shadow:0 8px 18px rgba(31,122,70,.28);')}>Hubungi via WhatsApp</a>
         </div>
       </div>
     </form>

@@ -10,16 +10,17 @@ export default async function ProfilPage() {
     getSettings(['profil_tentang', 'profil_alamat', 'profil_jam', 'profil_telepon', 'profil_instagram', 'profil_facebook', 'profil_foto']),
     getWaNumber(),
   ]);
-  const foto = p.profil_foto || 'https://picsum.photos/seed/aboet-profil/800/600';
   const telepon = p.profil_telepon || '0857-9900-1985';
 
   return (
     <>
-      <div className="hero-banner" style={{ backgroundImage: `url(${foto})` }}>
+      <div className="hero-banner hero-brand" style={p.profil_foto ? { backgroundImage: `linear-gradient(rgba(157,15,21,.55), rgba(157,15,21,.7)), url(${p.profil_foto})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
         <div className="hero-text">
           <h2>Aboet Adventure</h2>
           <p>Berpengalaman sejak 2015 di Sentul, Bogor</p>
         </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="Aboet Adventure Sentul" className="hero-logo" width={160} height={160} />
       </div>
 
       <div className="detail-sheet" style={s('margin-top:-22px; border-radius:22px 22px 0 0; background:var(--surface); padding:24px 18px;')}>
@@ -29,19 +30,19 @@ export default async function ProfilPage() {
         <div style={s('margin-top:24px; padding-top:16px; border-top:1px solid var(--border);')}>
           <h3 style={s('font-size:16px; margin-bottom:12px;')}>Informasi Kontak</h3>
           <div style={s('display:flex; flex-direction:column; gap:12px;')}>
-            <div style={s('display:flex; align-items:center; gap:12px;')}>
+            <div className="info-line">
               <span className="material-symbols-outlined" style={s('color:var(--primary);')}>location_on</span>
               <div>{p.profil_alamat}</div>
             </div>
-            <div style={s('display:flex; align-items:center; gap:12px;')}>
+            <div className="info-line">
               <span className="material-symbols-outlined" style={s('color:var(--primary);')}>schedule</span>
               <div style={s('white-space:pre-line;')}>{p.profil_jam}</div>
             </div>
-            <a href={`tel:${telepon.replace(/[^0-9+]/g, '')}`} style={s('display:flex; align-items:center; gap:12px; color:var(--primary-dark); font-weight:700; text-decoration:none;')}>
+            <a href={`tel:${telepon.replace(/[^0-9+]/g, '')}`} className="info-line" style={s('align-items:center; color:var(--primary-dark); font-weight:700; text-decoration:none;')}>
               <span className="material-symbols-outlined" style={s('color:var(--primary);')}>phone</span>
               <span>{telepon}</span>
             </a>
-            <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer" style={s('display:flex; align-items:center; gap:12px; color:var(--primary-dark); font-weight:700; text-decoration:none;')}>
+            <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer" className="info-line" style={s('align-items:center; color:var(--primary-dark); font-weight:700; text-decoration:none;')}>
               <span className="material-symbols-outlined" style={s('color:#25D366;')}>chat</span>
               <span>WhatsApp</span>
             </a>

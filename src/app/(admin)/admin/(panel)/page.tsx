@@ -28,18 +28,19 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
 
   const bulan = dua12Bulan();
   const peta = new Map(d.bulanan.map((b) => [b.bulan, b.total]));
+  const totalWa = d.total + d.korporat;
   const cards = [
-    { label: 'Total Pemesanan', nilai: String(d.total), ikon: 'receipt_long', warna: 'bg-primary-soft text-primary-dark' },
+    { label: 'Konfirmasi ke WhatsApp', nilai: String(totalWa), ikon: 'chat', warna: 'bg-primary-soft text-primary-dark' },
+    { label: 'Family (form + WA)', nilai: String(d.total), ikon: 'group', warna: 'bg-blue-100 text-blue-700' },
+    { label: 'Korporat (klik WA)', nilai: String(d.korporat), ikon: 'business', warna: 'bg-purple-100 text-purple-700' },
     { label: 'Pendapatan', nilai: rupiah(d.pendapatan), ikon: 'attach_money', warna: 'bg-green-100 text-green-700' },
-    { label: 'Baru', nilai: String(d.baru), ikon: 'fiber_new', warna: 'bg-blue-100 text-blue-700' },
-    { label: 'Selesai', nilai: String(d.selesai), ikon: 'task_alt', warna: 'bg-purple-100 text-purple-700' },
   ];
 
   return (
     <>
       <div className="mb-6 animate-fade-in">
         <h1 className="font-heading font-extrabold text-2xl md:text-3xl text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Ringkasan performa pemesanan</p>
+        <p className="text-gray-600 mt-1">Statistik orang yang sampai klik konfirmasi ke WhatsApp</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -74,6 +75,8 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         kategoriData={d.perKategori.map((k) => k.total)}
         paketLabel={d.terlaris.map((p) => p.nama)}
         paketData={d.terlaris.map((p) => p.total)}
+        waFamily={bulan.map((b) => d.waBulanan.family.find((x) => x.bulan === b)?.total ?? 0)}
+        waKorporat={bulan.map((b) => d.waBulanan.korporat.find((x) => x.bulan === b)?.total ?? 0)}
       />
 
       <div className="card animate-slide-up mb-6">

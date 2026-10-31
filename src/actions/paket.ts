@@ -72,6 +72,21 @@ export async function simpanPaket(id: number | null, _prev: FormState, fd: FormD
     }
   }
 
+  // Galeri slider: hapus yang dicentang, lalu tambahkan upload baru (maks. 8 foto total)
+  const hapusSet = new Set(fd.getAll('hapus_galeri').map(String));
+  let galeri = (lama?.galeri ?? []).filter((u) => !hapusSet.has(u));
+  for (const u of hapusSet) if ((lama?.galeri ?? []).includes(u)) await hapusFoto(u);
+  const baruFiles = fd.getAll('galeri_baru').filter((f): f is File => f instanceof File && f.size > 0);
+  if (galeri.length + baruFiles.length > 8) return gagal('Galeri maksimal 8 foto. Hapus beberapa foto lama dulu.');
+  for (const f of baruFiles) {
+    try {
+      galeri.push(await simpanFoto(f, 'paket'));
+    } catch (e) {
+      if (e instanceof UploadError) return gagal(e.message);
+      throw e;
+    }
+  }
+
   const termasuk = v.termasuk.split('\n').map((l) => l.trim()).filter(Boolean);
   const data = {
     kategoriId,
@@ -89,6 +104,7 @@ export async function simpanPaket(id: number | null, _prev: FormState, fd: FormD
     urutan,
     aktif: v.aktif,
     foto,
+    galeri,
   };
   if (id) await db.update(paket).set({ ...data, updatedAt: new Date() }).where(eq(paket.id, id));
   else await db.insert(paket).values(data);
@@ -104,6 +120,7 @@ export async function hapusPaket(id: number) {
   const [p] = await db.select().from(paket).where(eq(paket.id, id)).limit(1);
   if (p) {
     await hapusFoto(p.foto);
+    for (const u of p.galeri ?? []) await hapusFoto(u);
     await db.delete(paket).where(eq(paket.id, id));
   }
   revalidatePath('/');

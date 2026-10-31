@@ -1,6 +1,6 @@
 import './_env';
 import bcrypt from 'bcryptjs';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import { getDb, schema } from '../src/db';
 import { SEED_KATEGORI, SEED_PAKET, ringkasTier } from '../src/db/seed-data';
 import { SETTING_DEFAULTS } from '../src/lib/settings';
@@ -36,13 +36,22 @@ async function main() {
           minPeserta: min0,
           termasuk: p.termasuk,
           foto: `/paket/${p.slug}.webp`,
+          galeri: [1, 2, 3].map((n) => `/paket/galeri/${p.slug}-${n}.webp`),
           urutan: i + 1,
         })
         .onConflictDoNothing({ target: paket.slug });
       // isi foto bawaan untuk paket lama yang belum punya foto (tidak menimpa foto yang diupload admin)
       await db.update(paket).set({ foto: `/paket/${p.slug}.webp` }).where(and(eq(paket.slug, p.slug), isNull(paket.foto)));
+      // galeri slider: hanya isi kalau masih kosong (tidak menimpa galeri yang diatur admin)
+      await db
+        .update(paket)
+        .set({ galeri: [1, 2, 3].map((n) => `/paket/galeri/${p.slug}-${n}.webp`) })
+        .where(and(eq(paket.slug, p.slug), sql`jsonb_array_length(${paket.galeri}) = 0`));
     }
   }
+
+  // nama kategori diubah klien
+  await db.update(kategori).set({ nama: 'Activity Outbond' }).where(and(eq(kategori.slug, 'adventure-trail'), eq(kategori.nama, 'Adventure & Trail')));
 
   // paket lama (Easy/Medium tunggal) digantikan paket per-rute A–F: nonaktifkan, jangan hapus (pemesanan lama tetap utuh)
   for (const lama of ['fun-trekking-easy', 'fun-trekking-medium']) await db.update(paket).set({ aktif: false }).where(eq(paket.slug, lama));

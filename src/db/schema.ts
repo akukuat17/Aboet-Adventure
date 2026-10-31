@@ -44,6 +44,8 @@ export const paket = pgTable(
     deskripsi: text('deskripsi'),
     /** URL penuh (Vercel Blob) atau path /uploads/... saat dev lokal */
     foto: text('foto'),
+    /** Foto tambahan untuk slider di halaman detail (urutan = urutan tampil) */
+    galeri: jsonb('galeri').$type<string[]>().notNull().default([]),
     ikon: varchar('ikon', { length: 255 }),
     durasi: varchar('durasi', { length: 255 }),
     medan: varchar('medan', { length: 255 }),
@@ -86,6 +88,21 @@ export const pemesanan = pgTable(
     index('pemesanan_status_created_idx').on(t.status, t.createdAt),
     index('pemesanan_paket_status_idx').on(t.paketId, t.status),
   ],
+);
+
+/**
+ * Klik konfirmasi WhatsApp tipe KORPORAT (tanpa form, jadi tidak ada baris pemesanan).
+ * Konfirmasi WA family = baris di tabel pemesanan.
+ */
+export const klikWa = pgTable(
+  'klik_wa',
+  {
+    id: serial('id').primaryKey(),
+    paketId: integer('paket_id').references(() => paket.id, { onDelete: 'set null' }),
+    tipe: varchar('tipe', { length: 20 }).notNull().default('korporat'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('klik_wa_created_idx').on(t.createdAt)],
 );
 
 export const pengaturan = pgTable('pengaturan', {

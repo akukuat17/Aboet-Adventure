@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import BackButton from './BackButton';
 
 function Brand() {
   return (
@@ -50,7 +51,14 @@ export default function PublicShell({ children }: { children: React.ReactNode })
         </div>
       </header>
 
+      {halamanDalam && (
+        <div className="back-row">
+          <BackButton />
+        </div>
+      )}
+
       <div className={(halamanDalam ? 'topbar' : 'home-header') + ' desktop:hidden'}>
+        {halamanDalam && <BackButton className="icon-only" />}
         <Brand />
         {menuBtn}
       </div>

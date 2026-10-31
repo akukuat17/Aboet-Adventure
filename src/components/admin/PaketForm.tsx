@@ -99,6 +99,23 @@ export default function PaketForm({ paket, kategori }: { paket: Paket | null; ka
           </div>
 
           <div className="mb-6">
+            <label className={LABEL}>Galeri Foto (slider di halaman detail)</label>
+            {(paket?.galeri?.length ?? 0) > 0 && (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3">
+                {paket!.galeri.map((u) => (
+                  <label key={u} className="block text-xs text-gray-600 cursor-pointer">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={u} alt="" className="w-full h-20 object-cover rounded-lg border mb-1" />
+                    <input type="checkbox" name="hapus_galeri" value={u} className="mr-1 accent-primary" />Hapus
+                  </label>
+                ))}
+              </div>
+            )}
+            <input type="file" name="galeri_baru" accept="image/*" multiple className={INPUT} />
+            <p className="text-xs text-gray-500 mt-1">Bisa pilih beberapa foto sekaligus (maks. 8 foto total, tiap foto 2MB, total upload per simpan sekitar 4MB).</p>
+          </div>
+
+          <div className="mb-6">
             <label className={LABEL}>Yang Termasuk (satu per baris)</label>
             <textarea name="termasuk" rows={5} defaultValue={val('termasuk', paket?.termasuk?.join('\n'))} className={INPUT + ' font-mono text-sm'} placeholder={'Guide bersertifikat\nPerlengkapan safety\nAsuransi peserta\nAir mineral & snack'} />
           </div>

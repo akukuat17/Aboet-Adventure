@@ -22,7 +22,7 @@ export type SeedPaket = {
 export const SEED_KATEGORI = [
   { nama: 'Rafting & Aktivitas Air', slug: 'rafting-air', ikon: 'water', warnaBg: '#dcf0e2', warnaIkon: '#2f9e58', urutan: 1 },
   { nama: 'Fun Trekking & Hiking', slug: 'fun-trekking-hiking', ikon: 'hiking', warnaBg: '#dbeefb', warnaIkon: '#2f8fd1', urutan: 2 },
-  { nama: 'Adventure & Trail', slug: 'adventure-trail', ikon: 'directions_run', warnaBg: '#fde7d6', warnaIkon: '#e0793e', urutan: 3 },
+  { nama: 'Activity Outbond', slug: 'adventure-trail', ikon: 'directions_run', warnaBg: '#fde7d6', warnaIkon: '#e0793e', urutan: 3 },
 ];
 
 const trekkingDasar = [

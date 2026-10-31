@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { s } from '@/lib/css';
 import { fotoPaket, rupiah } from '@/lib/format';
 import { getPaketAktif } from '@/lib/queries';
+import FotoSlider from '@/components/public/FotoSlider';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,15 +23,12 @@ export default async function DetailPaketPage({ params }: Props) {
 
   const adaPills = paket.durasi || paket.minPeserta > 1 || paket.medan;
   const termasuk = paket.termasuk ?? [];
+  const fotos = [fotoPaket(paket.foto, paket.slug, '800/600'), ...(paket.galeri ?? [])];
 
   return (
     <div className="detail-layout">
-      <div className="detail-hero">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img id="detail-hero-img" src={fotoPaket(paket.foto, paket.slug, '800/600')} alt={paket.nama} />
-        <div className="top-overlay desktop:hidden">
-          <Link href="/" className="icon-btn" aria-label="Kembali ke daftar paket"><span className="material-symbols-outlined">arrow_back</span></Link>
-        </div>
+      <div className="detail-hero detail-hero-slider">
+        <FotoSlider fotos={fotos} alt={paket.nama} />
       </div>
 
       <div className="detail-right-col">
