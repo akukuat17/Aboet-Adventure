@@ -1,68 +1,45 @@
-'use client';
-
-import { useEffect, useRef } from 'react';
-import type { Chart as ChartType } from 'chart.js';
-
 export type DonutItem = { nama: string; ikon: string; warnaBg: string; warnaIkon: string; nilai: number };
 
 const idr = (n: number) => 'Rp' + Math.round(n).toLocaleString('id-ID');
 const persen = (n: number, total: number) => (total > 0 ? Math.round((n / total) * 100) : 0);
 
 /**
- * Donut tipis bergaya aplikasi bank: cincin bersegmen, lencana ikon di tiap segmen,
- * total di tengah, lalu daftar kategori (ikon · nama · nominal · persen).
+ * Donut tipis bergaya aplikasi bank (SVG murni, tanpa JavaScript klien supaya selalu tampil):
+ * cincin bersegmen, lencana ikon di tiap segmen, total di tengah, lalu daftar kategori.
  */
 export default function DonutBCA({ items, judulTengah, nilaiTengah, satuan = 'rupiah' }: { items: DonutItem[]; judulTengah: string; nilaiTengah: string; satuan?: 'rupiah' | 'jumlah' }) {
-  const ref = useRef<HTMLCanvasElement>(null);
   const aktif = items.filter((i) => i.nilai > 0);
   const total = aktif.reduce((a, b) => a + b.nilai, 0);
   const fmt = (n: number) => (satuan === 'rupiah' ? idr(n) : `${n} pesanan`);
 
-  useEffect(() => {
-    let chart: ChartType | null = null;
-    let batal = false;
-    (async () => {
-      const { Chart, registerables } = await import('chart.js');
-      if (batal || !ref.current) return;
-      Chart.register(...registerables);
-      chart = new Chart(ref.current, {
-        type: 'doughnut',
-        data: {
-          labels: total > 0 ? aktif.map((i) => i.nama) : ['Belum ada data'],
-          datasets: [{ data: total > 0 ? aktif.map((i) => i.nilai) : [1], backgroundColor: total > 0 ? aktif.map((i) => i.warnaIkon) : ['#e5e7eb'], borderColor: '#fff', borderWidth: 4, hoverOffset: 4, borderRadius: 0 }],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          cutout: '80%',
-          animation: { duration: 700 },
-          layout: { padding: 6 },
-          plugins: {
-            legend: { display: false },
-            tooltip: { enabled: total > 0, callbacks: { label: (c) => ` ${c.label}: ${fmt(Number(c.parsed))} (${persen(Number(c.parsed), total)}%)` } },
-          },
-        },
-      });
-    })();
-    return () => { batal = true; chart?.destroy(); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(aktif), satuan]);
-
-  // posisi lencana ikon di tengah ketebalan cincin (mulai dari atas, searah jarum jam)
+  // geometri cincin (viewBox 100×100)
+  const R = 43, TEBAL = 8, C = 2 * Math.PI * R, CELAH = aktif.length > 1 ? 1.2 : 0;
   let akum = 0;
-  const lencana = aktif.map((it) => {
-    const tengah = (akum + it.nilai / 2) / total;
+  const segmen = aktif.map((it) => {
+    const awal = akum / total;
     akum += it.nilai;
+    const frac = it.nilai / total;
+    const tengah = awal + frac / 2;
     const sudut = tengah * 2 * Math.PI;
-    const r = 0.45 * 0.9; // radius cincin (≈ 90% jari-jari) dalam satuan lebar kotak
-    return { it, left: 50 + Math.sin(sudut) * r * 100, top: 50 - Math.cos(sudut) * r * 100 };
+    const panjang = Math.max(frac * C - CELAH, 0.01);
+    return { it, panjang, offset: -(awal * C + CELAH / 2), left: 50 + Math.sin(sudut) * R, top: 50 - Math.cos(sudut) * R };
   });
+
 
   return (
     <div>
       <div className="relative mx-auto" style={{ maxWidth: 320 }}>
-        <canvas ref={ref} aria-label={`Diagram lingkaran ${judulTengah}`} role="img" />
-        {total > 0 && lencana.map(({ it, left, top }) => (
+        <svg viewBox="0 0 100 100" className="block w-full h-auto" role="img" aria-label={`Diagram lingkaran ${judulTengah}`}>
+          <circle cx="50" cy="50" r={R} fill="none" stroke="#e5e7eb" strokeWidth={TEBAL} />
+          <g transform="rotate(-90 50 50)">
+            {segmen.map(({ it, panjang, offset }) => (
+              <circle key={it.nama} cx="50" cy="50" r={R} fill="none" stroke={it.warnaIkon} strokeWidth={TEBAL} strokeDasharray={`${panjang} ${C - panjang}`} strokeDashoffset={offset}>
+                <title>{`${it.nama}: ${fmt(it.nilai)} (${persen(it.nilai, total)}%)`}</title>
+              </circle>
+            ))}
+          </g>
+        </svg>
+        {segmen.map(({ it, left, top }) => (
           <span key={it.nama} title={it.nama} className="absolute flex items-center justify-center rounded-full bg-white shadow-md" style={{ width: 34, height: 34, left: `${left}%`, top: `${top}%`, transform: 'translate(-50%, -50%)', boxShadow: '0 2px 8px rgba(0,0,0,.22)' }}>
             <span className="rounded-full flex items-center justify-center" style={{ width: 24, height: 24, background: it.warnaBg }}>
               <span className="material-symbols-outlined" style={{ fontSize: 16, color: it.warnaIkon, lineHeight: 1 }}>{it.ikon}</span>

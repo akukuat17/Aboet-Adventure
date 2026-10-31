@@ -104,7 +104,7 @@ export default function AdminShell({ nama, children, flash }: { nama: string; ch
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-6 lg:p-8 pt-16 lg:pt-0">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 pt-20 md:pt-20 lg:pt-8">
           {flash}
           {children}
         </main>

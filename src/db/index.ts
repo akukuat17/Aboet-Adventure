@@ -21,7 +21,7 @@ async function connect(): Promise<DB> {
     return drizzlePg(client, { schema }) as unknown as DB;
   }
 
-  if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+  if ((process.env.VERCEL || process.env.NODE_ENV === 'production') && !process.env.ALLOW_PGLITE) {
     throw new Error('DATABASE_URL belum diatur. Isi di Vercel → Settings → Environment Variables.');
   }
 

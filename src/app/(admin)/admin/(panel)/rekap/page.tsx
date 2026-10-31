@@ -48,10 +48,10 @@ export default async function Rekap({ searchParams }: { searchParams: Promise<{ 
           <h1 className="font-heading font-extrabold text-2xl md:text-3xl text-gray-900">Rekap Bulanan</h1>
           <p className="text-gray-600 mt-1">{BULAN[m - 1]} {y}</p>
         </div>
-        <div className="flex gap-2 flex-wrap items-center">
+        <div className="flex gap-2 items-center flex-wrap">
           <Link href={`/admin/rekap?bulan=${geser(bulan, -1)}`} className="btn btn-ghost" aria-label="Bulan sebelumnya">&larr;</Link>
-          <form method="GET" className="flex gap-2">
-            <input type="month" name="bulan" defaultValue={bulan} className="input" />
+          <form method="GET" className="flex gap-2 flex-1 min-w-0">
+            <input type="month" name="bulan" defaultValue={bulan} className="input min-w-0" />
             <button type="submit" className="btn btn-secondary">Lihat</button>
           </form>
           <Link href={`/admin/rekap?bulan=${geser(bulan, 1)}`} className="btn btn-ghost" aria-label="Bulan berikutnya">&rarr;</Link>
